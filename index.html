@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Інформаційна система школи</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="script.js" defer></script>
+</head>
+<body>
+
+    <h1>Інформаційна система школи</h1>
+
+    <!-- Вкладки для перемикання між таблицями -->
+    <div class="tabs">
+        <button class="tab active" data-table="students">
+            Учні
+        </button>
+
+        <button class="tab" data-table="teachers">
+            Учителі
+        </button>
+
+        <button class="tab" data-table="subjects">
+            Предмети
+        </button>
+    </div>
+
+    <!-- Таблиця учнів -->
+    <section id="students" class="table-section active">
+        <h2>Список учнів</h2>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Прізвище</th>
+                    <th>Ім'я</th>
+                    <th>Дата народження</th>
+                    <th>Клас</th>
+                    <th>Email</th>
+                    <th>Середній бал</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                <tr>
+                    <td>1</td>
+                    <td>Петренко</td>
+                    <td>Андрій</td>
+                    <td>15.05.2010</td>
+                    <td>10-А</td>
+                    <td>andrii@example.com</td>
+                    <td>10.5</td>
+                </tr>
+
+                <tr>
+                    <td>2</td>
+                    <td>Коваленко</td>
+                    <td>Марія</td>
+                    <td>20.08.2010</td>
+                    <td>10-А</td>
+                    <td>maria@example.com</td>
+                    <td>11.2</td>
+                </tr>
+
+                <tr>
+                    <td>3</td>
+                    <td>Мельник</td>
+                    <td>Олег</td>
+                    <td>10.02.2011</td>
+                    <td>9-Б</td>
+                    <td>oleh@example.com</td>
+                    <td>9.8</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <!-- Таблиця вчителів -->
+    <section id="teachers" class="table-section">
+        <h2>Список учителів</h2>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Прізвище</th>
+                    <th>Ім'я</th>
+                    <th>Предмет</th>
+                    <th>Категорія</th>
+                    <th>Стаж</th>
+                    <th>Email</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                <tr>
+                    <td>1</td>
+                    <td>Іваненко</td>
+                    <td>Олена</td>
+                    <td>Інформатика</td>
+                    <td>Вища</td>
+                    <td>15 років</td>
+                    <td>olena@example.com</td>
+                </tr>
+
+                <tr>
+                    <td>2</td>
+                    <td>Шевченко</td>
+                    <td>Петро</td>
+                    <td>Математика</td>
+                    <td>Перша</td>
+                    <td>10 років</td>
+                    <td>petro@example.com</td>
+                </tr>
+
+                <tr>
+                    <td>3</td>
+                    <td>Бондаренко</td>
+                    <td>Ірина</td>
+                    <td>Українська мова</td>
+                    <td>Вища</td>
+                    <td>20 років</td>
+                    <td>iryna@example.com</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <!-- Таблиця навчальних предметів -->
+    <section id="subjects" class="table-section">
+        <h2>Навчальні предмети</h2>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Назва предмета</th>
+                    <th>Годин на тиждень</th>
+                    <th>Кабінет</th>
+                    <th>Клас</th>
+                    <th>ID учителя</th>
+                    <th>Тип оцінювання</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                <tr>
+                    <td>1</td>
+                    <td>Інформатика</td>
+                    <td>2</td>
+                    <td>25</td>
+                    <td>10-А</td>
+                    <td>1</td>
+                    <td>12-бальна шкала</td>
+                </tr>
+
+                <tr>
+                    <td>2</td>
+                    <td>Математика</td>
+                    <td>5</td>
+                    <td>18</td>
+                    <td>10-А</td>
+                    <td>2</td>
+                    <td>12-бальна шкала</td>
+                </tr>
+
+                <tr>
+                    <td>3</td>
+                    <td>Українська мова</td>
+                    <td>3</td>
+                    <td>12</td>
+                    <td>9-Б</td>
+                    <td>3</td>
+                    <td>12-бальна шкала</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+
+</body>
+</html>

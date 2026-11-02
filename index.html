@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Інформаційна система школи</title>
+
     <link rel="stylesheet" href="style.css">
     <script src="script.js" defer></script>
 </head>
@@ -11,7 +13,7 @@
 
     <h1>Інформаційна система школи</h1>
 
-    <!-- Вкладки для перемикання між таблицями -->
+    <!-- Вкладки -->
     <div class="tabs">
         <button class="tab active" data-table="students">
             Учні
@@ -28,7 +30,14 @@
 
     <!-- Таблиця учнів -->
     <section id="students" class="table-section active">
+
         <h2>Список учнів</h2>
+
+        <button type="button" class="add-button">
+            Додати учня
+        </button>
+
+        <div class="form-container"></div>
 
         <table>
             <thead>
@@ -43,12 +52,12 @@
                 </tr>
             </thead>
 
-            <tbody>
+            <tbody id="studentsBody">
                 <tr>
                     <td>1</td>
                     <td>Петренко</td>
                     <td>Андрій</td>
-                    <td>15.05.2010</td>
+                    <td>2010-05-15</td>
                     <td>10-А</td>
                     <td>andrii@example.com</td>
                     <td>10.5</td>
@@ -58,28 +67,26 @@
                     <td>2</td>
                     <td>Коваленко</td>
                     <td>Марія</td>
-                    <td>20.08.2010</td>
+                    <td>2010-08-20</td>
                     <td>10-А</td>
                     <td>maria@example.com</td>
                     <td>11.2</td>
                 </tr>
-
-                <tr>
-                    <td>3</td>
-                    <td>Мельник</td>
-                    <td>Олег</td>
-                    <td>10.02.2011</td>
-                    <td>9-Б</td>
-                    <td>oleh@example.com</td>
-                    <td>9.8</td>
-                </tr>
             </tbody>
         </table>
+
     </section>
 
     <!-- Таблиця вчителів -->
     <section id="teachers" class="table-section">
+
         <h2>Список учителів</h2>
+
+        <button type="button" class="add-button">
+            Додати вчителя
+        </button>
+
+        <div class="form-container"></div>
 
         <table>
             <thead>
@@ -94,14 +101,14 @@
                 </tr>
             </thead>
 
-            <tbody>
+            <tbody id="teachersBody">
                 <tr>
                     <td>1</td>
                     <td>Іваненко</td>
                     <td>Олена</td>
                     <td>Інформатика</td>
                     <td>Вища</td>
-                    <td>15 років</td>
+                    <td>15</td>
                     <td>olena@example.com</td>
                 </tr>
 
@@ -111,26 +118,24 @@
                     <td>Петро</td>
                     <td>Математика</td>
                     <td>Перша</td>
-                    <td>10 років</td>
+                    <td>10</td>
                     <td>petro@example.com</td>
-                </tr>
-
-                <tr>
-                    <td>3</td>
-                    <td>Бондаренко</td>
-                    <td>Ірина</td>
-                    <td>Українська мова</td>
-                    <td>Вища</td>
-                    <td>20 років</td>
-                    <td>iryna@example.com</td>
                 </tr>
             </tbody>
         </table>
+
     </section>
 
     <!-- Таблиця навчальних предметів -->
     <section id="subjects" class="table-section">
+
         <h2>Навчальні предмети</h2>
+
+        <button type="button" class="add-button">
+            Додати предмет
+        </button>
+
+        <div class="form-container"></div>
 
         <table>
             <thead>
@@ -145,7 +150,7 @@
                 </tr>
             </thead>
 
-            <tbody>
+            <tbody id="subjectsBody">
                 <tr>
                     <td>1</td>
                     <td>Інформатика</td>
@@ -165,18 +170,9 @@
                     <td>2</td>
                     <td>12-бальна шкала</td>
                 </tr>
-
-                <tr>
-                    <td>3</td>
-                    <td>Українська мова</td>
-                    <td>3</td>
-                    <td>12</td>
-                    <td>9-Б</td>
-                    <td>3</td>
-                    <td>12-бальна шкала</td>
-                </tr>
             </tbody>
         </table>
+
     </section>
 
 </body>

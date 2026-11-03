@@ -195,6 +195,14 @@ sections.forEach(function(section) {
                 return;
             }
 
+            // Перевіряємо ID учителя для нового предмета
+            if (section.id === "subjects") {
+                if (!teacherExists(values[4])) {
+                    alert("Учителя з таким ID не існує!");
+                    return;
+                }
+            }
+
             // Знаходимо таблицю, до якої додаємо запис
             const tbody = document.getElementById(schema.bodyId);
 
@@ -211,9 +219,21 @@ sections.forEach(function(section) {
             values.forEach(function(value) {
                 const cell = document.createElement("td");
                 cell.textContent = value;
-
                 row.appendChild(cell);
             });
+
+            // Створюємо комірку для кнопки видалення
+            const actionCell = document.createElement("td");
+
+            const deleteButton = document.createElement("button");
+
+            deleteButton.type = "button";
+            deleteButton.className = "delete-button";
+            deleteButton.textContent = "✖";
+
+            actionCell.appendChild(deleteButton);
+
+            row.appendChild(actionCell);
 
             // Додаємо рядок у таблицю
             tbody.appendChild(row);
@@ -246,3 +266,274 @@ function getNextId(tbody) {
 
     return maxId + 1;
 }
+
+
+// Функція перевірки існування вчителя
+function teacherExists(teacherId) {
+    const teachersBody = document.getElementById("teachersBody");
+
+    const teachers = teachersBody.querySelectorAll("tr");
+
+    return Array.from(teachers).some(function(row) {
+
+        return Number(row.cells[0].textContent) === Number(teacherId);
+
+    });
+}
+
+
+// Функція перевірки можливості видалення вчителя
+function canDeleteTeacher(teacherId) {
+
+    const subjectsBody = document.getElementById("subjectsBody");
+
+    const subjects = subjectsBody.querySelectorAll("tr");
+
+    // Перевіряємо всі навчальні предмети
+    for (const subject of subjects) {
+
+        // ID учителя знаходиться у шостій комірці
+        const subjectTeacherId = subject.cells[5].textContent;
+
+        if (Number(subjectTeacherId) === Number(teacherId)) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+
+// Функція видалення записів
+function deleteRecord(section, row) {
+
+    const recordId = row.cells[0].textContent;
+
+    // Перевіряємо, чи видаляємо вчителя
+    if (section.id === "teachers") {
+
+        if (!canDeleteTeacher(recordId)) {
+
+            alert(
+                "Неможливо видалити вчителя!\n" +
+                "Він використовується в таблиці навчальних предметів."
+            );
+
+            return;
+        }
+    }
+
+    // Підтвердження видалення
+    const confirmed = confirm(
+        "Ви дійсно хочете видалити запис ID " + recordId + "?"
+    );
+
+    if (!confirmed) {
+        return;
+    }
+
+    // Видаляємо рядок таблиці
+    row.remove();
+
+    alert("Запис успішно видалено!");
+}
+
+
+// Функція створення кнопок видалення
+function initializeDeleteButtons() {
+
+    sections.forEach(function(section) {
+
+        const tbody = section.querySelector("tbody");
+
+        // Перевіряємо всі рядки таблиці
+        const rows = tbody.querySelectorAll("tr");
+
+        rows.forEach(function(row) {
+
+            // Якщо комірки для дій ще немає, створюємо її
+            if (row.cells.length === schemas[section.id].fields.length + 1) {
+
+                const actionCell = document.createElement("td");
+                row.appendChild(actionCell);
+            }
+
+            // Знаходимо комірку дій
+            const actionCell = row.cells[row.cells.length - 1];
+
+            // Якщо кнопки ще немає, створюємо її
+            if (!actionCell.querySelector(".delete-button")) {
+
+                const button = document.createElement("button");
+
+                button.type = "button";
+                button.className = "delete-button";
+                button.textContent = "✖";
+
+                actionCell.appendChild(button);
+            }
+        });
+
+        // Один обробник для всіх кнопок цієї таблиці
+        tbody.addEventListener("click", function(event) {
+
+            if (event.target.classList.contains("delete-button")) {
+
+                const row = event.target.closest("tr");
+
+                deleteRecord(section, row);
+            }
+        });
+    });
+}
+
+
+// Функція редагування комірки
+function editCell(cell, section) {
+
+    // Визначаємо індекс комірки
+    const cellIndex = cell.cellIndex;
+
+    // Отримуємо опис потрібної сутності
+    const schema = schemas[section.id];
+
+    // ID та остання комірка (Дії) не редагуються
+    if (cellIndex === 0 || cellIndex === cell.parentElement.cells.length - 1) {
+        return;
+    }
+
+    // Отримуємо опис поля
+    const field = schema.fields[cellIndex - 1];
+
+    // Зберігаємо початкове значення
+    const oldValue = cell.textContent;
+
+    // Створюємо поле введення
+    const input = document.createElement("input");
+
+    input.type = field.type;
+    input.value = oldValue;
+    input.required = true;
+
+    // Встановлюємо обмеження для числових полів
+    if (field.min !== undefined) {
+        input.min = field.min;
+    }
+
+    if (field.max !== undefined) {
+        input.max = field.max;
+    }
+
+    if (field.step !== undefined) {
+        input.step = field.step;
+    }
+
+    // Очищаємо комірку та додаємо поле введення
+    cell.textContent = "";
+    cell.appendChild(input);
+
+    // Фокусуємо поле
+    input.focus();
+
+    // Функція збереження
+    function saveValue() {
+
+        // Перевіряємо, чи поле ще існує
+        if (!input.isConnected) {
+            return;
+        }
+
+        const newValue = input.value.trim();
+
+        // Перевіряємо правильність введення
+        if (!input.reportValidity()) {
+            input.focus();
+            return;
+        }
+
+        // Не дозволяємо залишати поле порожнім
+        if (newValue === "") {
+            alert("Значення не може бути порожнім!");
+            input.focus();
+            return;
+        }
+
+        // Перевіряємо зв'язок предмета з учителем
+        if (section.id === "subjects" && field.name === "ID учителя") {
+
+            const teachersBody = document.getElementById("teachersBody");
+
+            const teachers = teachersBody.querySelectorAll("tr");
+
+            const teacherExists = Array.from(teachers).some(function(row) {
+                return Number(row.cells[0].textContent) === Number(newValue);
+            });
+
+            if (!teacherExists) {
+                alert("Учителя з таким ID не існує!");
+                input.focus();
+                return;
+            }
+        }
+
+        // Зберігаємо нове значення
+        cell.textContent = newValue;
+    }
+
+    // Зберігаємо зміни при натисканні Enter
+    input.addEventListener("keydown", function(event) {
+
+        if (event.key === "Enter") {
+            event.preventDefault();
+            saveValue();
+        }
+
+        // Скасовуємо редагування при Escape
+        if (event.key === "Escape") {
+            cell.textContent = oldValue;
+        }
+    });
+
+    // Зберігаємо зміни при втраті фокуса
+    input.addEventListener("blur", saveValue);
+}
+
+
+// Функція обробки натискання на комірку
+function initializeEditing() {
+
+    sections.forEach(function(section) {
+
+        const tbody = section.querySelector("tbody");
+
+        tbody.addEventListener("click", function(event) {
+
+            // Знаходимо комірку, по якій натиснув користувач
+            const cell = event.target.closest("td");
+
+            // Перевіряємо, чи натискання було всередині комірки
+            if (!cell || !tbody.contains(cell)) {
+                return;
+            }
+
+            // Не редагуємо комірку з кнопкою видалення
+            if (cell.cellIndex === cell.parentElement.cells.length - 1) {
+                return;
+            }
+
+            // Не запускаємо повторне редагування
+            if (cell.querySelector("input")) {
+                return;
+            }
+
+            // Запускаємо редагування
+            editCell(cell, section);
+        });
+    });
+}
+
+
+// Ініціалізація програми
+initializeDeleteButtons();
+
+initializeEditing();

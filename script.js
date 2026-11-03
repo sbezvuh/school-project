@@ -127,10 +127,23 @@ sections.forEach(function(section) {
             const label = document.createElement("label");
             label.textContent = field.name;
 
-            const input = document.createElement("input");
-            input.type = field.type;
-            input.name = "field" + index;
-            input.required = true;
+            let input;
+
+            if (section.id === "subjects" && field.name === "ID учителя") {
+                input = document.createElement("select");
+                input.name = "field" + index;
+                input.required = true;
+                // Позначаємо список учителів
+                input.dataset.teacherSelect = "true";
+
+                fillTeacherSelect(input);
+
+            } else {
+                input = document.createElement("input");
+                input.type = field.type;
+                input.name = "field" + index;
+                input.required = true;
+            }
 
             // Додаткові обмеження для числових полів
             if (field.min !== undefined) {
@@ -237,6 +250,10 @@ sections.forEach(function(section) {
 
             // Додаємо рядок у таблицю
             tbody.appendChild(row);
+            saveData();
+
+            // Оновлюємо відкриті списки вчителів
+            refreshTeacherSelects();
 
             // Очищаємо та закриваємо форму
             form.reset();
@@ -334,6 +351,10 @@ function deleteRecord(section, row) {
 
     // Видаляємо рядок таблиці
     row.remove();
+    saveData();
+
+    // Оновлюємо відкриті списки вчителів
+    refreshTeacherSelects();
 
     alert("Запис успішно видалено!");
 }
@@ -409,10 +430,19 @@ function editCell(cell, section) {
     const oldValue = cell.textContent;
 
     // Створюємо поле введення
-    const input = document.createElement("input");
+    let input;
+    if (section.id === "subjects" && field.name === "ID учителя") {
+        input = document.createElement("select");
+        // Позначаємо список учителів
+        input.dataset.teacherSelect = "true";
 
-    input.type = field.type;
-    input.value = oldValue;
+        fillTeacherSelect(input);
+        input.value = oldValue;
+    } else {
+        input = document.createElement("input");
+        input.type = field.type;
+        input.value = oldValue;
+    }
     input.required = true;
 
     // Встановлюємо обмеження для числових полів
@@ -478,6 +508,10 @@ function editCell(cell, section) {
 
         // Зберігаємо нове значення
         cell.textContent = newValue;
+        saveData();
+
+        // Оновлюємо відкриті списки вчителів
+        refreshTeacherSelects();
     }
 
     // Зберігаємо зміни при натисканні Enter
@@ -522,7 +556,7 @@ function initializeEditing() {
             }
 
             // Не запускаємо повторне редагування
-            if (cell.querySelector("input")) {
+            if (cell.querySelector("input, select")) {
                 return;
             }
 
@@ -533,7 +567,157 @@ function initializeEditing() {
 }
 
 
+// Функція збереження таблиць
+function saveData() {
+
+    const data = {};
+
+    document.querySelectorAll(".table-section").forEach(section => {
+
+        const tbody = section.querySelector("tbody");
+
+        data[section.id] = Array.from(tbody.rows).map(row => {
+
+            return Array.from(row.cells)
+                .slice(0, -1)
+                .map(cell => {
+
+                    // Перевіряємо, чи комірка зараз редагується
+                    const editor = cell.querySelector("input, select");
+
+                    // Якщо редагується — беремо значення з поля
+                    if (editor) {
+                        return editor.value.trim();
+                    }
+
+                    // Якщо не редагується — беремо текст комірки
+                    return cell.textContent.trim();
+                });
+        });
+    });
+
+    localStorage.setItem("schoolData", JSON.stringify(data));
+}
+
+
+// Функція завантаження інформації з localStorage
+function loadData() {
+    const savedData = localStorage.getItem("schoolData");
+
+    if (!savedData) {
+        return;
+    }
+
+    let data;
+    try {
+        data = JSON.parse(savedData);
+    } catch (error) {
+        console.error("Помилка завантаження даних:", error);
+        alert("Не вдалося завантажити збережені дані!");
+        return;
+    }
+
+    Object.keys(data).forEach(tableName => {
+        const tbody = document.getElementById(tableName + "Body");
+
+        if (!tbody) {
+            return;
+        }
+
+        tbody.innerHTML = "";
+
+        data[tableName].forEach(rowData => {
+            const row = document.createElement("tr");
+
+            rowData.forEach(value => {
+                const cell = document.createElement("td");
+                cell.textContent = value;
+                row.appendChild(cell);
+            });
+
+            const actionCell = document.createElement("td");
+            const deleteButton = document.createElement("button");
+
+            deleteButton.textContent = "✖";
+            deleteButton.classList.add("delete-button");
+            deleteButton.type = "button";
+
+            actionCell.appendChild(deleteButton);
+            row.appendChild(actionCell);
+
+            tbody.appendChild(row);
+        });
+    });
+}
+
+
+// Автоматична синхронізація між вкладками браузера
+window.addEventListener("storage", function(event) {
+
+    if (event.key === "schoolData") {
+
+        // Завантажуємо актуальні дані
+        loadData();
+
+        // Оновлюємо відкриті списки вчителів
+        refreshTeacherSelects();
+    }
+});
+
+
+function fillTeacherSelect(select) {
+    const teachersBody = document.getElementById("teachersBody");
+
+    select.innerHTML = '<option value="">Оберіть учителя</option>';
+
+    Array.from(teachersBody.rows).forEach(row => {
+        const id = row.cells[0].textContent;
+        const surname = row.cells[1].textContent;
+        const name = row.cells[2].textContent;
+
+        const option = document.createElement("option");
+
+        option.value = id;
+        option.textContent = surname + " " + name;
+
+        select.appendChild(option);
+    });
+}
+
+
+// Оновлення всіх відкритих списків учителів
+function refreshTeacherSelects() {
+
+    // Знаходимо всі списки учителів
+    const selects = document.querySelectorAll(
+        'select[data-teacher-select="true"]'
+    );
+
+    selects.forEach(function(select) {
+
+        // Запам'ятовуємо вибраний ID учителя
+        const selectedValue = select.value;
+
+        // Оновлюємо список
+        fillTeacherSelect(select);
+
+        // Перевіряємо, чи існує попередньо вибраний учитель
+        const teacherExists = Array.from(select.options).some(function(option) {
+            return option.value === selectedValue;
+        });
+
+        // Відновлюємо вибір, якщо такий учитель існує
+        if (teacherExists) {
+            select.value = selectedValue;
+        }
+    });
+}
+
+
+// Відновлення даних
+loadData()
+
+
 // Ініціалізація програми
 initializeDeleteButtons();
-
 initializeEditing();
